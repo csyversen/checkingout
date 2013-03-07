@@ -8,9 +8,9 @@ namespace CheckingOut
 {
     class Customer
     {        
-        public string Type { get; set; }
-        public int Arrival { get; set; }
-        public int NumItems { get; set; }
+        public string Type { get; private set; }
+        public int Arrival { get; private set; }
+        public int NumItems { get; private set; }
         public int CheckOutStartTime { get; set; }
 
         public Customer(string argType, int argArrival, int argItems)
@@ -24,7 +24,5 @@ namespace CheckingOut
         {
             return String.Format("Customer Type: {0} Arrival Time: {1} Items: {2} CheckoutStartTime: {3}", Type, Arrival, NumItems, CheckOutStartTime);
         }
-
-
     }
 }

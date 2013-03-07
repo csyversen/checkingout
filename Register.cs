@@ -8,7 +8,7 @@ namespace CheckingOut
 {
     class Register
     {
-        public  List<Customer> line { get; private set; }
+        public List<Customer> line { get; private set; }
         public int Time { get; private set; }
         private int itemTime;
 
@@ -46,11 +46,10 @@ namespace CheckingOut
                 return true;
         }
 
-        // this needs to be called "GetNumPeopleInLineAtTime()"
+        // this counts the number of people that have queued up but have not checked out
         public int GetNumPeopleInLineAtTime(int i)
         {
-            int lol = line.Count(c => c.Arrival <= i && i < c.CheckOutStartTime + c.NumItems * itemTime);
-            return lol;
+            return line.Count(c => c.Arrival <= i && i < c.CheckOutStartTime + c.NumItems * itemTime);
         }
 
         public Customer GetLastCustomerInLine()
@@ -63,9 +62,7 @@ namespace CheckingOut
             Customer cust = line.Last();            
 
             // this gives you the time at which the customer was done checking out. 
-            Console.WriteLine(cust.ToString());
             Time = cust.CheckOutStartTime + cust.NumItems * itemTime;
-            Console.WriteLine("Customer will be done checking out at: " + Time);
         }
     }
 }
