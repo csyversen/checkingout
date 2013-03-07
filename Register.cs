@@ -8,66 +8,49 @@ namespace CheckingOut
 {
     class Register
     {
-        // TODO: this might have to get changed to a list, i don't want to ever get rid of any values
         public  List<Customer> line { get; private set; }
         public int Time { get; private set; }
-        public bool Trainee { get; private set; }
         private int itemTime;
-        private bool isProcessing { get; set; }
 
         public Register(bool isTrainee)
         {
-            Trainee = isTrainee;
             line = new List<Customer>();
-            if (Trainee)
-            {
+            if (isTrainee)
                 itemTime = 2;
-                Console.WriteLine("This is a trainee register");
-            }
             else
-            {
                 itemTime = 1;
-            }
-            
         }
 
         public void GetInLine(Customer c)
         {
-            
-            // person gets in line. 
-            // check to see if the cashier is checking out anybody at this time
-            // if no, this person begins the checkout process. 
-            // if yes, this person 'gets in line' and has the previous person's 'finish' time set as their own 'arrival' time?
+            // c arrives at their arrival time.
+            // check to see if the cashier is checking out anybody at c's arrival time
+            // if yes, this person has to wait until the person in front of them is finished checking out before they start their own checkout process
+            // if no, this person can check out right away.
 
-            if (CanCheckOut(c.Arrival))
-            {
-                c.CheckOutStartTime = c.Arrival;
-                line.Add(c);                
-                CheckOutCustomer();
-            }
+            if (CanCheckOutNow(c.Arrival))
+                c.CheckOutStartTime = c.Arrival;                
             else
-            {
-                c.CheckOutStartTime = Time;                   
-                line.Add(c);
-                CheckOutCustomer();
-            }
+                c.CheckOutStartTime = Time;
+            
+            line.Add(c);
+            CheckOutCustomer();
         }        
 
-        //check to see how many customers are in line at what time, and if they are being processed or not
-        public bool CanCheckOut(int i)
+        public bool CanCheckOutNow(int i)
         {
-            //if i falls between any customer's arrival time and their checkout time, then they get in line
-            if (line.Any(c => c.Arrival <= i && i < c.Arrival + c.NumItems * itemTime))
-            {
+            // if i falls between anybody's checkoutstarttime and their end time, that means that somebody is already checking out right now
+            if (line.Any(c => c.CheckOutStartTime <= i && i < c.CheckOutStartTime + c.NumItems * itemTime))
                 return false;
-            }
-            return true;
+            else
+                return true;
         }
 
-
-        public int GetNumPeopleInLine()
+        // this needs to be called "GetNumPeopleInLineAtTime()"
+        public int GetNumPeopleInLineAtTime(int i)
         {
-            return line.Count;
+            int lol = line.Count(c => c.Arrival <= i && i < c.CheckOutStartTime + c.NumItems * itemTime);
+            return lol;
         }
 
         public Customer GetLastCustomerInLine()

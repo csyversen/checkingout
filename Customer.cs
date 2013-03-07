@@ -7,9 +7,7 @@ using System.Threading.Tasks;
 namespace CheckingOut
 {
     class Customer
-    {
-        enum CustType {A, B};
-
+    {        
         public string Type { get; set; }
         public int Arrival { get; set; }
         public int NumItems { get; set; }

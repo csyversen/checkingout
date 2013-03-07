@@ -9,7 +9,6 @@ namespace CheckingOut
     class Store
     {
         List<Customer> customers = new List<Customer>();        
-        //Time start?
 
         public int NumRegisters { get; set; }
         public Register[] registers { get; private set; }
@@ -41,7 +40,6 @@ namespace CheckingOut
 
         private void sortCustomers()
         {
-            // TODO: this is ok for now, but in the future i'll have to get a snapshot of what the registers will look like at a specific point in time             
             customers = customers.OrderBy(c => c.Arrival).ThenBy(c => c.NumItems).ThenBy(c => c.Type).ToList();
         }
 
@@ -65,23 +63,24 @@ namespace CheckingOut
                 //if no queue has 0 entries, then customer A will go to the queue that has the shortest line
                 if (c.Type == "A")
                 {
-                    registers = registers.OrderBy(r => r.GetNumPeopleInLine()).ToArray();
-                    registers[0].GetInLine(c);
+                    // TODO: c.arrival should actually probably be the earliest time at which any of the registers will be free
+                    registers.OrderBy(r => r.GetNumPeopleInLineAtTime(c.Arrival)).First().GetInLine(c);
                 }
                 if (c.Type == "B")
                 {
-                    if (registers.Any(r => r.GetNumPeopleInLine() == 0))
+                    if (registers.Any(r => r.GetNumPeopleInLineAtTime(c.Arrival) == 0))
                     {
-                        registers.First(r => r.GetNumPeopleInLine() == 0).GetInLine(c);
+                        registers.First(r => r.GetNumPeopleInLineAtTime(c.Arrival) == 0).GetInLine(c);
                     }
                     else
                     {
-                        registers = registers.OrderBy(r => r.GetNumPeopleInLine()).ThenBy(r => r.GetLastCustomerInLine().NumItems).ToArray();
-                        registers[0].GetInLine(c);
+                        // get the person last in line with the fewest amount of items, type B goes in that line
+                        registers.OrderBy(r => r.GetLastCustomerInLine().NumItems).First().GetInLine(c);                        
                     }
                 }
             }
             // At this point all of the customers have checked out, go through the registers and see who has the highest 'Time' value, that's what should be returned
+            Console.WriteLine("The max value for all registers is: " + registers.Max(r => r.Time));
         }
     }
 }
